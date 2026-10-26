@@ -1,0 +1,613 @@
+/* =================================================================
+   FOGLIO DI STILE
+   =================================================================
+   Come è organizzato questo file:
+   1. VARIABILI COLORE (:root)
+   2. STILI DI BASE (body, layout)
+   3. INTESTAZIONE / LOGIN
+   4. TAB DI NAVIGAZIONE
+   5. TABELLA BILANCIO (la "pagina ledger" color pergamena)
+   6. TABELLE DATI (movimenti / trasferimenti, tema scuro)
+   7. FORM DI INSERIMENTO
+   8. IMPOSTAZIONI (griglia conti / categorie)
+   ============================================================== */
+
+
+:root{
+  --ink:        #1F1F1F;
+  --ink-2:      #292929;
+  --brass:      #92AFD7;
+  --brass-dim:  #59677B;
+  --green:      #349169;
+  --red:        #C2422E;
+  --text-dim:   #E1E9F4;
+  --radius:       20px;
+  /* https://coolors.co/92afd7-d2deee-96a3b5-59677b-1f1f1f-292929-349169-c2422e */
+}
+/* --- 2. STILI DI BASE --------------------------------------- */
+*{box-sizing:border-box;}
+body{
+  margin:         0;
+  background:     var(--ink);
+  color:          var(--text-dim);
+  font-family:    'Roboto',sans-serif;
+  min-height:     100vh;
+}
+.wrap{
+  max-width:      1400px;
+  margin:         0 auto;
+  padding:        20px 20px 80px;
+}
+
+/* --- 3. INTESTAZIONE / AREA LOGIN --------------------------- */
+header.top{
+  display:        flex;
+  justify-content:space-between;
+  align-items:    center;
+  border-bottom:  2px solid var(--brass-dim);
+  padding-bottom: 20px;
+  margin-bottom:  25px;
+  flex-wrap:      wrap;
+  gap:            15px;
+}
+.brand{
+  display:        flex;
+  align-items:    center;
+  gap:            15px;
+}
+h1{
+  font-family:    'Roboto',sans-serif;
+  font-weight:    900;
+  font-size:      30px;
+  margin:         0;
+}
+.subtitle{
+  color:          var(--text-dim);
+  font-size:      15px;
+}
+.auth-area{
+  display:        flex;
+  align-items:    center;
+  gap:            15px;
+  font-size:      15px;
+  color:          var(--text-dim);
+}
+.btn{
+  font-family:    'Roboto',sans-serif;
+  font-weight:    600;
+  font-size:      15px;
+  background:     var(--brass);
+  color:          var(--ink);
+  border:         none;
+  border-radius:  var(--radius);
+  padding:        10px 15px;
+  cursor:         pointer;
+  transition:     filter .15s ease;
+  height:         40px;
+}
+.btn:hover        {filter:brightness(1.5)}
+.btn.small{
+  padding:        5px 10px;
+  font-size:      15px;
+}
+.btn.secondary{
+  background:     transparent;
+  color:          var(--text-dim);
+  border:         2px solid var(--brass-dim);
+  outline:        none;
+}
+.btn.secondary:hover{border-color:var(--brass)}
+.btn.danger       {background:var(--red)}
+.status-dot{
+  width:          10px;
+  height:         10px;
+  border-radius:  50%;
+  background:     var(--brass-dim);
+  display:        inline-block;
+  margin-right:   5px;
+}
+.status-dot.ok    {background:var(--green);}
+.status-dot.err   {background:var(--red);}
+
+/* --- 4. TAB DI NAVIGAZIONE ---------------------------------- */
+nav.tabs{
+  display:        flex;
+  gap:            5px;
+  margin-bottom:  20px;
+  border-bottom:  1px solid var(--ink-2);
+  flex-wrap:      wrap;
+}
+nav.tabs button{
+  background:     none;
+  border:         none;
+  color:          var(--text-dim);
+  font-family:    'Roboto',sans-serif;
+  font-weight:    600;
+  font-size:      15px;
+  padding:        10px 15px;
+  cursor:         pointer;
+  border-bottom:  2px solid transparent;
+}
+nav.tabs button.active{
+  color:          var(--brass);
+  border-bottom-color:var(--brass);
+}
+nav.tabs button:hover:not(.active){color:var(--text-dim);}
+.panel            {display:none;}
+.panel.active     {display:block;}
+
+/* Schermata mostrata prima del login ------------------------- */
+.gate{
+  text-align:     center;
+  padding:        70px 20px;
+  color:          var(--text-dim);
+}
+.gate h2{
+  font-family:    'Roboto',sans-serif;
+  color:          var(--text-dim);
+  font-weight:    900;
+}
+
+/* --- 5. TABELLA BILANCIO ------------------------------------ */
+.card{
+  background:     var(--ink-2);
+  color:          var(--text-dim);
+  border-radius:  calc(var(--radius)*2);
+  padding:        20px 20px;
+  margin-bottom:  20px;
+  overflow-x:     auto;
+}
+table.ledger{
+  border-collapse:collapse;
+  width:          100%;
+  font-family:    'Roboto Mono',monospace;
+  font-size:      13px;
+  white-space:    nowrap;
+}
+table.ledger th, table.ledger td{
+  padding:        5px 5px;
+  text-align:     right;
+  border-bottom:  1px solid var(--brass-dim);
+}
+table.ledger th:first-child, table.ledger td:first-child{
+  text-align:     left;
+  font-family:    'Roboto',sans-serif;
+  font-weight:    500;
+  position:       sticky;
+  left:           -20px;
+  background:     var(--ink-2);
+}
+table.ledger thead th{
+  font-family:    'Roboto',sans-serif;
+  font-size:      15px;
+  text-transform: uppercase;
+  color:          var(--brass-dim);
+  border-bottom:  2px solid var(--brass-dim);
+}
+tr.row-total td{
+  border-top:     2px solid var(--text-dim);
+  border-bottom:  2px solid var(--text-dim);
+  padding:        15px 0;
+}
+tr.row-balance td {border-bottom:  2px solid var(--text-dim);}
+tr.row-section td{
+  color:          var(--text-dim);
+  padding-top:    15px;
+}
+tr.row-sub        {color:var(--brass-dim);}
+tr.row-sub td:first-child{padding-left:20px;}
+tr.row-spacer td  {border:none;}
+.pos              {color:var(--green);}
+.neg              {color:var(--red);}
+select.year-select{
+  font-family:    'Roboto',sans-serif;
+  font-weight:    600;
+  font-size:      15px;
+  background:     var(--brass);
+  color:          var(--ink);
+  border:         none;
+  border-radius:  var(--radius);
+  padding:        10px 15px;
+  cursor:         pointer;
+}
+
+/* --- 6-7. TABELLE DATI E FORM ------------------------------- */
+.toolbar{
+  display:        flex;
+  justify-content:space-between;
+  align-items:    center;
+  margin-bottom:  15px;
+  flex-wrap:      wrap;gap:10px;
+}
+.toolbar h2{
+  font-family:    'Roboto',sans-serif;
+  font-weight:    900;
+  margin:         0;
+  font-size:      20px;
+}
+table.data{
+  width:          100%;
+  border-collapse:collapse;
+  font-size:      13px;
+}
+table.data th{
+  text-align:     left;
+  font-size:      13px;
+  text-transform: uppercase;
+  letter-spacing: 0.4px;
+  color:          var(--text-dim);
+  border-bottom:  1px solid var(--brass-dim);
+  padding:        10px 10px;
+}
+table.data td{
+  padding:        5px 5px;
+  vertical-align: middle;
+}
+table.data tbody tr:hover{background:var(--ink-2);}
+.amount           {font-family:'Roboto Mono',monospace;}
+.row-actions{
+  display:flex;
+  gap:5px;
+}
+
+form.entry{
+  background:     var(--ink-2);
+  border:         1px solid var(--brass-dim);
+  border-radius:  calc(var(--radius)*2);
+  padding:        20px;
+  margin-bottom:  20px;
+  display:        grid;
+  grid-template-columns:repeat(auto-fit,minmax(250px,1fr));
+  gap:            10px;
+  align-items:    end;
+}
+form.entry label{
+  display:        block;
+  font-size:      10px;
+  color:          var(--text-dim);
+  margin-bottom:  5px;
+  text-transform: uppercase;
+}
+form.entry input, form.entry select{
+  width:          100%;
+  background:     var(--ink);
+  border:         none;
+  color:          var(--text-dim);
+  border-radius:  var(--radius);
+  padding:        10px 10px;
+  font-family:    'Roboto',sans-serif;
+  font-size:      13px;
+}
+form.entry .full  {grid-column:1/-1;}
+
+/* --- 8. IMPOSTAZIONI ---------------------------------------- */
+.settings-grid{
+  display:        grid;
+  grid-template-columns:1fr 1fr;
+  gap:            20px;
+}
+@media(max-width:800px){
+  .settings-grid  {grid-template-columns:1fr;}
+}
+.mini-list{
+  list-style:     none;
+  margin:         0;
+  padding:        0;
+}
+.mini-list li{
+  display:        flex;
+  justify-content:space-between;
+  align-items:    center;
+  padding:        5px 0 5px 20px;
+  font-size:      15px;
+}
+.macro-block      {margin-bottom:20px;}
+.macro-block:last-of-type{margin-bottom:0;}
+.macro-header{
+  display:        flex;
+  align-items:    center;
+  justify-content:space-between;
+  font-weight:    700;
+  font-size:      15px;
+  padding:        5px 0;
+  border-bottom:  1px solid var(--brass-dim);
+}
+ul.cat-sub-list{
+  list-style:     none;
+  margin:         0;
+  padding:        0 0 20px 20px;
+}
+ul.cat-sub-list li{
+  position:       relative;
+  display:        flex;
+  align-items:    center;
+  justify-content:space-between;
+  font-size:      15px;
+  padding:        5px 0 5px 20px;
+}
+ul.cat-sub-list li.add-row{
+  margin-left:   -20px;
+  gap:            10px;
+}
+.add-row.add-macro-row{
+  display:        flex;
+  gap:            10px;
+}
+input{
+  flex:           1;
+  background:     var(--ink);
+  border:         none;
+  color:          var(--text-dim);
+  border-radius:  var(--radius);
+  padding:        10px 20px;
+  font-family:    'Roboto',sans-serif;
+  font-size:      13px; 
+}
+
+footer.foot{
+  text-align:     center;
+  color:          var(--brass-dim);
+  font-size:      13px;
+  bottom:         50px;
+  left:           50px;
+  right:          50px;
+}
+
+/* --- 9. Filtri e collasso ------------------------------------ */
+
+.mov-month-header span {
+  white-space: nowrap;
+  margin: 10px;
+}
+
+.mov-filters {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  align-items: end;
+
+  margin-bottom: 18px;
+  padding: 14px;
+
+  border: 1px solid var(--line);
+  border-radius: 10px;
+}
+
+.mov-filter {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+
+  min-width: 160px;
+  flex: 1;
+}
+
+.mov-filter label {
+  font-size: 13px;
+  font-weight: 700;
+  text-transform: uppercase;
+  text-align: center;
+}
+
+.mov-filter select {
+  width: 100%;
+}
+
+.mov-filter-reset {
+  display: flex;
+  align-items: end;
+}
+
+.mov-month-toggle {
+  appearance: none;
+  border: 0;
+  background: transparent;
+  width: 100%;
+  text-align: left;
+  cursor: pointer;
+  font-weight:    700;
+  font-size:      15px;
+  color:          var(--brass);
+  padding: 10px;
+  background-color: var(--ink);
+  border-radius:  var(--radius);
+  margin-top: 10px;
+  height: 40px;
+}
+
+.mov-month-toggle:hover {
+  opacity: .65;
+}
+
+.mov-empty {
+  padding: 30px !important;
+  text-align: center;
+  opacity: .55;
+}
+
+select option {
+  background-color: var(--ink);
+}
+
+/* --- 10. Grafici bilancio (area in pila) ----------------------- */
+
+.charts-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 20px;
+}
+
+.chart-card {
+  flex: 1 1 320px;
+  min-width: 300px;
+}
+
+.chart-wrap {
+  position: relative;
+}
+
+.chart-svg {
+  width: 100%;
+  height: auto;
+  overflow: visible;
+}
+
+/* Legenda: un pallino colorato + nome per ogni serie, sempre
+   visibile quando il grafico ha 2 o più serie.                   */
+.chart-legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 15px;
+  margin-bottom: 10px;
+  font-size: 13px;
+}
+
+.chart-legend-item {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.chart-legend-swatch {
+  width: 10px;
+  height: 10px;
+  border-radius: 3px;
+  display: inline-block;
+}
+
+/* Tooltip mostrato al passaggio del mouse su un mese: segue il
+   grafico ma è posizionato "a mano" via JS (left/right in %).    */
+.chart-tooltip {
+  display: none;
+  position: absolute;
+  top: 6px;
+  z-index: 2;
+  background: var(--ink);
+  border: 1px solid var(--brass-dim);
+  border-radius: 10px;
+  padding: 10px 12px;
+  font-size: 13px;
+  white-space: nowrap;
+  pointer-events: none;
+}
+
+.chart-tooltip-title {
+  font-weight: 700;
+  color: var(--brass);
+  text-transform: uppercase;
+  font-size: 11px;
+  margin-bottom: 6px;
+}
+
+.chart-tooltip-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  display: inline-block;
+  margin-right: 6px;
+}
+
+.chart-placeholder {
+  min-height: 260px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--brass-dim);
+  border: 1px dashed var(--brass-dim);
+  border-radius: var(--radius);
+  font-size: 13px;
+}
+
+/* --- 11. Controlli grafico macro categorie --------------------- */
+.macro-chart-controls {
+  display: grid;
+  gap: 12px;
+  margin-bottom: 14px;
+  padding: 12px;
+  background: var(--ink);
+  border-radius: var(--radius);
+}
+
+.macro-chart-control-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px 14px;
+  align-items: center;
+}
+
+.macro-chart-control-label {
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  color: var(--brass-dim);
+  min-width: 82px;
+}
+
+.macro-chart-pills {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 7px;
+  flex: 1;
+}
+
+.macro-chart-pill {
+  position: relative;
+}
+
+.macro-chart-pill input {
+  position: absolute;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.macro-chart-pill span,
+.macro-chart-segment button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 32px;
+  padding: 6px 11px;
+  border: 1px solid var(--brass-dim);
+  border-radius: 999px;
+  background: transparent;
+  color: var(--text-dim);
+  font: inherit;
+  font-size: 12px;
+  cursor: pointer;
+}
+
+.macro-chart-pill input:checked + span,
+.macro-chart-segment button.active {
+  background: var(--brass);
+  border-color: var(--brass);
+  color: var(--ink);
+  font-weight: 700;
+}
+
+.macro-chart-segment {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.macro-chart-check {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  font-size: 12px;
+  cursor: pointer;
+}
+
+.macro-chart-check input {
+  accent-color: var(--brass);
+}
+
+.chart-empty {
+  min-height: 260px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  color: var(--brass-dim);
+  font-size: 13px;
+}

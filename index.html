@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Balancy</title>
+
+<!-- Font Google: Roboto + Roboto Mono                           -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;600;700;900&family=Roboto+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+
+<!-- Libreria Google per il login (Google Identity Services)     -->
+<script src="https://accounts.google.com/gsi/client" async defer></script>
+
+<!-- Stile -->
+<link rel="stylesheet" href="style.css">
+<link rel="icon" href="logo.svg?v=1" type="image/svg+xml">
+</head>
+
+<body>
+<div class="wrap">
+
+  <!-- === INTESTAZIONE ======================================== -->
+  <!-- Titolo a sinistra, stato login + pulsante a destra        -->
+  <header class="top">
+    <div class="brand">
+      <img src="logo.svg" alt="Logo" id="logo" style="width: 60px;">
+      <div>
+        <h1>BALANCY</h1>
+        <div class="subtitle">Bilancio personale</div>
+      </div>
+    </div>
+    <div class="auth-area" id="authArea">
+      <span><span class="status-dot" id="statusDot"></span><span id="statusText">non connesso</span></span>
+      <button class="btn" id="loginBtn">Accedi con Google</button>
+    </div>
+  </header>
+
+  <!-- === TAB DI NAVIGAZIONE ================================== -->
+  <!-- Nascosta finché non si effettua il login                  -->
+  <nav class="tabs" id="tabs" style="display:none;">
+    <button data-tab="bilancio" class="active">Bilancio</button>
+    <button data-tab="movimenti">Movimenti</button>
+    <button data-tab="trasferimenti">Trasferimenti</button>
+    <button data-tab="impostazioni">Impostazioni</button>
+  </nav>
+
+  <!-- Messaggio mostrato prima del login                        -->
+  <div id="gate" class="gate">
+    <h2>Accedi con Google per aprire il tuo bilancio</h2>
+    <p>I dati vengono letti e salvati in un file <strong>bilancio-accounting.json</strong> sul tuo Google Drive personale.<br>Nessun dato viene inviato altrove.</p>
+  </div>
+
+  <!-- === CONTENUTO (dopo il login) =========================== -->
+  <div id="content" style="display:none;">
+
+    <!-- --- TAB 1: BILANCIO ----------------------------------- -->
+    <!-- Tabella riepilogativa mese per mese. Il contenuto della card
+         (#bilancioCard) viene generato interamente da JS: qui c'è solo
+         il contenitore vuoto + il menu a tendina dell'anno.     -->
+    <section class="panel active" id="panel-bilancio">
+      <div class="toolbar">
+        <select class="year-select" id="yearSelect"></select>
+      </div>
+      <div class="card" id="bilancioCard"></div>
+
+      <!-- Due grafici ad area in pila, affiancati: andamento dei conti
+           (a sinistra) ed entrate/uscite mese per mese (a destra).
+           Il contenuto di ciascuno è disegnato da renderBilancioCharts()
+           in app.js, in puro SVG, senza librerie esterne.        -->
+      <div class="charts-row">
+        <div class="card chart-card">
+          <h3>Andamento conti</h3>
+          <div class="chart-wrap" id="chartConti"></div>
+        </div>
+        <div class="card chart-card">
+          <h3>Entrate e uscite</h3>
+          <div class="chart-wrap" id="chartFlussi"></div>
+        </div>
+      </div>
+
+      <div class="charts-row">
+        <div class="card chart-card">
+          <h3>Entrate e uscite cumulative giornaliere</h3>
+          <div class="chart-wrap" id="chartFlussiGiornalieri"></div>
+        </div>
+        <div class="card chart-card">
+          <h3>Andamento macro categorie</h3>
+          <div class="macro-chart-controls" id="macroChartControls"></div>
+          <div class="chart-wrap" id="chartMacro"></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- --- TAB 2: MOVIMENTI ---------------------------------- -->
+    <!-- Entrate/uscite singole. #movForm è il modulo di aggiunta/modifica
+         (nascosto finché non si clicca "+ Nuovo movimento"), #movTable è
+         l'elenco: entrambi vengono riempiti da app.js.          -->
+    <section class="panel" id="panel-movimenti">
+      <div class="toolbar">
+        <button class="btn" id="newMovBtn">+ Nuovo movimento</button>
+      </div>
+      <form class="entry" id="movForm" style="display:none;"></form>
+      <div class="card">
+        <table class="data" id="movTable"></table>
+      </div>
+    </section>
+
+    <!-- --- TAB 3: TRASFERIMENTI ------------------------------ -->
+    <!-- Spostamenti di denaro tra i tuoi conti (non contano come entrata/
+         uscita nel bilancio). Stessa logica della tab Movimenti.-->
+    <section class="panel" id="panel-trasferimenti">
+      <div class="toolbar">
+        <button class="btn" id="newTraBtn">+ Nuovo trasferimento</button>
+      </div>
+      <form class="entry" id="traForm" style="display:none;"></form>
+      <div class="card">
+        <table class="data" id="traTable"></table>
+      </div>
+    </section>
+
+    <!-- --- TAB 4: IMPOSTAZIONI ------------------------------- -->
+    <!-- Gestione di conti, saldi iniziali per anno, macro categorie e
+         categorie. Ogni riquadro ha: una lista (mini-list) popolata da JS
+         + un piccolo form per aggiungere un nuovo elemento.     -->
+    <section class="panel" id="panel-impostazioni">
+      <div class="toolbar">
+        <div>
+          <button class="btn secondary small" id="exportBtn">Esporta JSON</button>
+          <button class="btn secondary small" id="importBtn">Importa JSON</button>
+          <input type="file" id="importFile" accept=".json" style="display:none;">
+        </div>
+      </div>
+      <div class="settings-grid">
+
+        <!-- Conti (es. TradeRepublic, Banca Sella...)           -->
+        <div class="card">
+          <h3>Conti</h3>
+          <ul class="mini-list" id="contiList"></ul>
+          <form id="contoForm" style="margin-top:12px;display:flex;gap:8px;">
+            <input placeholder="nome" id="contoNome">
+            <button class="btn small" type="submit">Aggiungi</button>
+          </form>
+        </div>
+
+        <!-- Saldo di partenza di ogni conto, per ogni anno      -->
+        <div class="card">
+          <h3>Saldi iniziali</h3>
+          <div id="saldiIniziali"></div>
+        </div>
+      </div>
+
+      <div class="card" id="categorieTree">
+      </div>
+    </section>
+  </div>
+
+  <footer class="foot">Balancy - dati salvati solo sul tuo Google Drive personale</footer>
+</div>
+
+<!-- Logica applicativa ======================================== -->
+<script src="app.js"></script>
+</body>
+</html>
