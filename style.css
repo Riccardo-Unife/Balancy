@@ -72,6 +72,12 @@ h1{
   font-size:      15px;
   color:          var(--text-dim);
 }
+@media(max-width:720px){
+  .auth-area{
+    width:        100%;
+    justify-content: space-between;
+  }
+}
 .btn{
   font-family:    'Roboto',sans-serif;
   font-weight:    600;
